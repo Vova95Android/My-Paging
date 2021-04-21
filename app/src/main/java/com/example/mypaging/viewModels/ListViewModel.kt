@@ -41,8 +41,4 @@ class ListViewModelImpl(private val paging: MyPagingSorce) : ListViewModel() {
         }
     }
 
-    fun getPosition(): Int {
-        return position
-    }
-
 }

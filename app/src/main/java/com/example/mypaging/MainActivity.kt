@@ -34,12 +34,9 @@ class MainActivity : AppCompatActivity() {
                 viewModel.setNewPosition(it)
             }
         )
-
+        list.adapter=adapter
         viewModel.newDataToAdapter.observe(this,{
             adapter.submitList(it)
-            list.adapter=adapter
-            adapter.notifyDataSetChanged()
-            list.scrollToPosition(viewModel.getPosition()-14)
         })
     }
 }
