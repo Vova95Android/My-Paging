@@ -7,11 +7,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mypaging.data.NumData
 import com.example.mypaging.databinding.NumItemBinding
-import com.example.mypaging.paging.MyPagingSorce
 
 class NumAdapter(val listener: OnClickListener, val change: OnChangeListener) : ListAdapter<NumData, NumAdapter.NumPropertyViewHolder>(DiffCallback()) {
 
-    private var listData: List<NumData> = listOf()
     var activeLastPosition=0
 
     class DiffCallback : DiffUtil.ItemCallback<NumData>() {
@@ -47,9 +45,6 @@ class NumAdapter(val listener: OnClickListener, val change: OnChangeListener) : 
 
     override fun submitList(list: List<NumData>?) {
         super.submitList(list)
-        if (list != null) {
-            listData=list
-        }
 
     }
 
