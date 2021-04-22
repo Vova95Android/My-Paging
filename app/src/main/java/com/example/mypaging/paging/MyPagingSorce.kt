@@ -2,7 +2,6 @@ package com.example.mypaging.paging
 
 import com.example.mypaging.api.ApiService
 import com.example.mypaging.data.NumData
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
@@ -15,10 +14,10 @@ class MyPagingSource @Inject constructor(
     private var activeLastPosition = 0
     private var limit = 30
 
-    private var loading = false
+    private var mutex= Mutex()
 
     fun isLoading(): Boolean {
-        return loading
+        return mutex.isLocked
     }
 
     suspend fun nextPage(pos: Int): List<NumData>? {
@@ -37,10 +36,9 @@ class MyPagingSource @Inject constructor(
     }
 
     private suspend fun getNextData(limit: Int, offset: Int): List<NumData> {
-        loading = true
-        val listTemp= api.getListNum(limit)
-        loading = false
-        return listTemp
+        mutex.withLock {
+            return api.getListNum(limit)
+        }
     }
 
 

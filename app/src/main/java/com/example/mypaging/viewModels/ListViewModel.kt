@@ -28,7 +28,7 @@ class ListViewModelImpl(private val paging: MyPagingSource) : ListViewModel() {
     }
 
     fun setPosition(pos: Int) {
-        if (!paging.isLoading()) {
+        if(!paging.isLoading()) {
             job?.cancel()
             job = viewModelScope.launch(Dispatchers.IO) {
                 val list = paging.nextPage(pos)
