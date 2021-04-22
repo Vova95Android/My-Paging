@@ -5,9 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mypaging.data.NumData
-import com.example.mypaging.paging.MyPagingSorce
+import com.example.mypaging.paging.MyPagingSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 abstract class ListViewModel() : ViewModel() {
 
@@ -15,31 +17,25 @@ abstract class ListViewModel() : ViewModel() {
 }
 
 
-class ListViewModelImpl(private val paging: MyPagingSorce) : ListViewModel() {
+class ListViewModelImpl(private val paging: MyPagingSource) : ListViewModel() {
 
     override val newDataToAdapter = MutableLiveData<List<NumData>>()
 
-    var limit = 30
-    private var position = 0
-    var job: Job?=null
+    private var job: Job? = null
 
     init {
-        getNumb()
+        setPosition(0)
     }
 
-    fun setNewPosition(pos: Int) {
-        position = pos
-        if (position + limit > newDataToAdapter.value!!.size) {
-            getNumb()
-        }
-    }
-
-    fun getNumb(){
-        job?.cancel()
-        job = viewModelScope.launch {
-            val data = paging.getNextData(limit * 3, position)
-            if (newDataToAdapter.value==null) newDataToAdapter.value=data
-            else newDataToAdapter.value = newDataToAdapter.value!!.plus(data)
+    fun setPosition(pos: Int) {
+        if (!paging.isLoading()) {
+            job?.cancel()
+            job = viewModelScope.launch(Dispatchers.IO) {
+                val list = paging.nextPage(pos)
+                withContext(Dispatchers.Main) {
+                    if (list != null) newDataToAdapter.value = list
+                }
+            }
         }
     }
 

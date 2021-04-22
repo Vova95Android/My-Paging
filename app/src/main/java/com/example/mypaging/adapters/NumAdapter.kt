@@ -8,9 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mypaging.data.NumData
 import com.example.mypaging.databinding.NumItemBinding
 
-class NumAdapter(val listener: OnClickListener, val change: OnChangeListener) : ListAdapter<NumData, NumAdapter.NumPropertyViewHolder>(DiffCallback()) {
-
-    var activeLastPosition=0
+class NumAdapter(private val listener: OnClickListener, private val change: OnChangeListener) :
+    ListAdapter<NumData, NumAdapter.NumPropertyViewHolder>(DiffCallback()) {
 
     class DiffCallback : DiffUtil.ItemCallback<NumData>() {
         override fun areItemsTheSame(oldItem: NumData, newItem: NumData): Boolean {
@@ -28,11 +27,8 @@ class NumAdapter(val listener: OnClickListener, val change: OnChangeListener) : 
 
     override fun onBindViewHolder(holder: NumPropertyViewHolder, position: Int) {
         val num = getItem(position)
-        if (position>activeLastPosition) {
-            activeLastPosition = position
-            change.onChange(activeLastPosition)
-        }
-        holder.bind(num, listener, activeLastPosition)
+        change.onChange(position)
+        holder.bind(num, listener)
     }
 
     class OnClickListener(val clickListener: (num: NumData) -> Unit) {
@@ -43,15 +39,11 @@ class NumAdapter(val listener: OnClickListener, val change: OnChangeListener) : 
         fun onChange(position: Int) = changeListener(position)
     }
 
-    override fun submitList(list: List<NumData>?) {
-        super.submitList(list)
-
-    }
-
-    class NumPropertyViewHolder(private var binding: NumItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(data: NumData, listener: OnClickListener, activeLastPosition: Int) {
+    class NumPropertyViewHolder(private var binding: NumItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(data: NumData, listener: OnClickListener) {
             binding.executePendingBindings()
-            binding.textNum.text="Rundom num is ${data.num}"
+            binding.textNum.text = "Randoms num is ${data.num}"
             itemView.setOnClickListener { listener.onClick(data) }
         }
     }
