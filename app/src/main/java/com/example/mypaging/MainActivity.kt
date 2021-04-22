@@ -2,6 +2,8 @@ package com.example.mypaging
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +24,8 @@ class MainActivity : AppCompatActivity() {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(ListViewModelImpl::class.java)
         val textPos = findViewById<TextView>(R.id.textPosition)
         val list = findViewById<RecyclerView>(R.id.num_list)
+        val progressBar=findViewById<ProgressBar>(R.id.progressBar)
+        progressBar.visibility= View.VISIBLE
         val adapter = NumAdapter(
             NumAdapter.OnClickListener {
 
@@ -33,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         )
         list.adapter = adapter
         viewModel.newDataToAdapter.observe(this, {
+            progressBar.visibility=View.GONE
             adapter.submitList(it)
         })
     }

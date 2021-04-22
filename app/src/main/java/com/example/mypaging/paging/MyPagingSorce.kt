@@ -10,7 +10,7 @@ import javax.inject.Inject
 class MyPagingSource @Inject constructor(
     private val api: ApiService
 ) {
-    var list: List<NumData>? = null
+    private var list: List<NumData>? = null
 
     private var activeLastPosition = 0
     private var limit = 30
@@ -22,27 +22,25 @@ class MyPagingSource @Inject constructor(
     }
 
     suspend fun nextPage(pos: Int): List<NumData>? {
-        if (list.isNullOrEmpty()) {
-            loading = true
-            list = getNextData(limit, activeLastPosition)
-            loading = false
-            return list
-        }
 
         if (pos > activeLastPosition) {
             activeLastPosition = pos
         }
-        return if ((!list.isNullOrEmpty()) && (activeLastPosition + limit > list!!.size)) {
-            loading = true
+        return if (list.isNullOrEmpty()) {
+            list = getNextData(limit, activeLastPosition)
+            list
+        } else if (activeLastPosition + limit > list!!.size) {
             list = list!!.plus(getNextData(limit, activeLastPosition))
-            loading = false
             list
         } else null
 
     }
 
     private suspend fun getNextData(limit: Int, offset: Int): List<NumData> {
-        return api.getListNum(limit)
+        loading = true
+        val listTemp= api.getListNum(limit)
+        loading = false
+        return listTemp
     }
 
 
