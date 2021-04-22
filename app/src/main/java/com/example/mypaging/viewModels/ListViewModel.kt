@@ -21,23 +21,25 @@ class ListViewModelImpl(private val paging: MyPagingSorce) : ListViewModel() {
 
     var limit = 30
     private var position = 0
-    var job: Job
+    var job: Job?=null
 
     init {
-        job = viewModelScope.launch {
-            val data = paging.getNextData(limit * 3, position)
-            newDataToAdapter.value = data
-        }
+        getNumb()
     }
 
     fun setNewPosition(pos: Int) {
         position = pos
         if (position + limit > newDataToAdapter.value!!.size) {
-            job.cancel()
-            job = viewModelScope.launch {
-                val data=paging.getNextData(limit, newDataToAdapter.value!!.size)
-                newDataToAdapter.value = newDataToAdapter.value!!.plus(data)
-            }
+            getNumb()
+        }
+    }
+
+    fun getNumb(){
+        job?.cancel()
+        job = viewModelScope.launch {
+            val data = paging.getNextData(limit * 3, position)
+            if (newDataToAdapter.value==null) newDataToAdapter.value=data
+            else newDataToAdapter.value = newDataToAdapter.value!!.plus(data)
         }
     }
 
